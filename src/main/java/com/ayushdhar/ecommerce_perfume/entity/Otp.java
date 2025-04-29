@@ -32,7 +32,7 @@ public class Otp {
     @Generated(GenerationTime.INSERT)
     private LocalDateTime expireAt;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "adminUserId", referencedColumnName = "id", insertable = false, updatable = false)
     private AdminUser adminUser;
 

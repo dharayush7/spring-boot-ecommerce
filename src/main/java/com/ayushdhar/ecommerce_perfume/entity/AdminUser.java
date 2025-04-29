@@ -31,7 +31,7 @@ public class AdminUser {
     private String mobileNo;
     @Column(nullable = false)
     private String password;
-    @ElementCollection
+    @Column(nullable = false)
     private List<String> permission;
     @Column(nullable = false)
     private Boolean isOwner = false;
