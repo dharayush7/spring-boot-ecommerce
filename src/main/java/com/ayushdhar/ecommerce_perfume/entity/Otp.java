@@ -36,6 +36,13 @@ public class Otp {
     @JoinColumn(name = "adminUserId", referencedColumnName = "id", insertable = false, updatable = false)
     private AdminUser adminUser;
 
+    @Column
+    private String adminRestPasswordSessionId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "adminRestPasswordSessionId", referencedColumnName = "id", insertable = false, updatable = false)
+    private AdminRestPasswordSession adminRestPasswordSession;
+
 
     @PrePersist
     public void prePersist() {
@@ -43,6 +50,4 @@ public class Otp {
             id = generateCuid();
         }
     }
-
-
 }

@@ -1,6 +1,7 @@
 package com.ayushdhar.ecommerce_perfume.controller.admin;
 
 import com.ayushdhar.ecommerce_perfume.dto.admin.auth.*;
+import com.ayushdhar.ecommerce_perfume.entity.AdminRestPasswordSession;
 import com.ayushdhar.ecommerce_perfume.entity.AdminSession;
 import com.ayushdhar.ecommerce_perfume.entity.AdminUser;
 import com.ayushdhar.ecommerce_perfume.entity.Otp;
@@ -13,10 +14,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
 import java.util.List;
@@ -137,6 +135,120 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/forget-password")
+    public ResponseEntity<ApiResponse<ForgetOtpResponseDTO>> forgetPassword(@Valid @RequestBody ForgetOtpRequestDTO forgetOtpRequestDTO) {
+        ApiResponse<ForgetOtpResponseDTO> response = new ApiResponse<>();
+        try {
+            Optional<AdminUser> optionalAdminUser = authService.findByEmail(forgetOtpRequestDTO.getEmail());
 
+            if (optionalAdminUser.isEmpty()) {
+                response.setMsg("User not found");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+
+            AdminUser adminUser = optionalAdminUser.get();
+
+            authService.deleteAllOtpsForUser(adminUser.getId());
+            authService.deleteAllAdminRestPasswordSessionsByAdminUserId(adminUser.getId());
+
+            AdminRestPasswordSession adminRestPasswordSession = authService.saveNewAdminRestPasswordSession(adminUser.getId());
+
+            Integer otp = ComplexOtpGenerator.generateOtp();
+            authService.saveNewOtpForRestPasswordSession(adminUser.getId(), otp, adminRestPasswordSession.getId());
+
+            ForgetOtpResponseDTO forgetOtpResponseDTO = new ForgetOtpResponseDTO();
+            forgetOtpResponseDTO.setRestSessionId(adminRestPasswordSession.getId());
+
+            response.setData(forgetOtpResponseDTO);
+            response.setMsg("Otp sent successfully");
+            log.info("Otp: {}", otp);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            response.setMsg(Constants.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/verify-opts")
+    public ResponseEntity<ApiResponse<Void>> verifyOtps (@RequestHeader("Authorization") String authHeader, @RequestBody VerifyOtpsRequestDTO verifyOtpsRequestDTO) {
+        ApiResponse<Void> response = new ApiResponse<>();
+        try {
+            Optional<AdminRestPasswordSession> optionalAdminRestPasswordSession = authService.findAdminRestPasswordSessionById(authHeader.split(" ")[1]);
+
+            if (optionalAdminRestPasswordSession.isEmpty()) {
+                response.setMsg(Constants.SESSION_NOT_FOUND);
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+
+            AdminRestPasswordSession adminRestPasswordSession = optionalAdminRestPasswordSession.get();
+
+            if (Utils.isExpired(adminRestPasswordSession.getExpireAt())) {
+                response.setMsg("Session expired");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+
+            List<Otp> otps = adminRestPasswordSession.getAdminUser().getOtps();
+            otps.sort(Comparator.comparing(Otp::getCreatedAt).reversed());
+            Otp otp = otps.getFirst();
+
+            if (!Objects.equals(verifyOtpsRequestDTO.getOtp(), otp.getCode().toString())) {
+                response.setMsg("Wrong otp");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+
+            authService.deleteAllOtpsForUser(adminRestPasswordSession.getAdminUser().getId());
+
+            adminRestPasswordSession.setIsVarfied(true);
+            authService.updateAdminRestPasswordSession(adminRestPasswordSession);
+
+            response.setMsg("Otp verified successfully");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            response.setMsg(Constants.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/change-password")
+    public  ResponseEntity<ApiResponse<Void>> changePassword(@RequestHeader("Authorization") String authHeader, @RequestBody ChangePasswordRequestDTO changePasswordRequestDTO){
+        ApiResponse<Void> response = new ApiResponse<>();
+        try {
+            Optional<AdminRestPasswordSession> optionalAdminRestPasswordSession = authService.findAdminRestPasswordSessionById(authHeader.split(" ")[1]);
+
+            if (optionalAdminRestPasswordSession.isEmpty()) {
+                response.setMsg(Constants.SESSION_NOT_FOUND);
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+
+            AdminRestPasswordSession adminRestPasswordSession = optionalAdminRestPasswordSession.get();
+
+            if (Utils.isExpired(adminRestPasswordSession.getExpireAt())) {
+                response.setMsg("Session expired");
+            }
+
+            if (Boolean.FALSE.equals(adminRestPasswordSession.getIsVarfied()) || Boolean.TRUE.equals(adminRestPasswordSession.getIsChanged())) {
+                response.setMsg(Constants.SESSION_NOT_FOUND);
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+
+            AdminUser adminUser = adminRestPasswordSession.getAdminUser();
+            adminUser.setPassword(utils.encodePassword(changePasswordRequestDTO.getPassword()));
+            authService.updateAdminUser(adminUser);
+
+            adminRestPasswordSession.setIsChanged(true);
+            authService.updateAdminRestPasswordSession(adminRestPasswordSession);
+
+            response.setMsg("Password changed successfully");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            response.setMsg(Constants.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }

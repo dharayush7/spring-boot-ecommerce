@@ -46,6 +46,8 @@ public class AdminUser {
     @OneToMany(mappedBy = "adminUser", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<AdminSession> adminSessions;
 
+    @OneToMany(mappedBy = "adminUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AdminRestPasswordSession> adminRestPasswordSessions;
 
     @PrePersist
     public void prePersist() {

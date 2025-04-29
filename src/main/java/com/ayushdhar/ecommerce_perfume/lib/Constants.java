@@ -5,4 +5,6 @@ public class Constants {
         throw new IllegalStateException("Utility class");
     }
     public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
+
+    public static final String SESSION_NOT_FOUND = "Session not found";
 }
