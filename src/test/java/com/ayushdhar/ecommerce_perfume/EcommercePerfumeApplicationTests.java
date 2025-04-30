@@ -15,7 +15,7 @@ class EcommercePerfumeApplicationTests {
     @Autowired
     private AdminUserRepository adminUserRepository;
 
-
+    @Test
     void contextLoads() {
         AdminUser adminUser = new AdminUser();
         Utils utils = new Utils();

@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface OtpRepository extends JpaRepository<Otp, String> {
-    void deleteByAdminUserId(String adminUserId);
+    void deleteOtpsByAdminUserId(String adminUserId);
     List<Otp> findByAdminUserIdOrderByCreatedAtDesc(String adminUserId);
 }

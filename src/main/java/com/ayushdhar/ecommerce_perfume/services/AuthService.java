@@ -49,7 +49,7 @@ public class AuthService {
 
     @Transactional
     public void deleteAllOtpsForUser(String adminUserId) {
-        otpRepository.deleteByAdminUserId(adminUserId);
+        otpRepository.deleteOtpsByAdminUserId(adminUserId);
     }
 
     @Transactional
@@ -75,7 +75,7 @@ public class AuthService {
 
     @Transactional
     public void deleteAllAdminSessionsByAdminUserId(String adminUserId)  {
-        adminSessionRepository.deleteAdminSessionByAdminUserId(adminUserId);
+        adminSessionRepository.deleteAdminSessionsByAdminUserId(adminUserId);
     }
 
     @Transactional
