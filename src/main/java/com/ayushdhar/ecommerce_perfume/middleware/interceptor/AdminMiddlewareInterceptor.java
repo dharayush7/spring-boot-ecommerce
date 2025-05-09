@@ -31,9 +31,9 @@ public class AdminMiddlewareInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        String sessionId = authHeader.split(" ")[1];
+        String sessionToken = authHeader.split(" ")[1];
 
-        Optional<AdminSession> sessionOpt = adminSessionRepository.findById(sessionId);
+        Optional<AdminSession> sessionOpt = adminSessionRepository.findBySessionToken(sessionToken);
         if (sessionOpt.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"msg\": \"Session not found\"}");

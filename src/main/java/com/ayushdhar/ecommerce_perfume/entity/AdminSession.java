@@ -23,6 +23,8 @@ public class AdminSession {
     private String id;
     @Column(nullable = false)
     private String adminUserId;
+    @Column(nullable = false, unique = true)
+    private String sessionToken;
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -39,6 +41,9 @@ public class AdminSession {
     public void prePersist() {
         if (id == null) {
             id = generateCuid();
+        }
+        if (sessionToken == null) {
+            sessionToken = generateCuid();
         }
     }
 }

@@ -10,6 +10,8 @@ public class Constants {
 
     public static final String ADMIN = "ADMIN";
 
+    public static final String CATEGORY = "CATEGORY";
+
     public static final String ACCESS_DENIED = "Access Denied";
 
     public static final String MANAGER_NOT_FOUND = "Manager not found";

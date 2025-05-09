@@ -52,6 +52,7 @@ public class AuthService {
         otpRepository.deleteOtpsByAdminUserId(adminUserId);
     }
 
+
     @Transactional
     public void saveNewOtp(String adminUserId, Integer code) {
         Otp otp = new Otp();
@@ -73,10 +74,10 @@ public class AuthService {
         return otpRepository.findByAdminUserIdOrderByCreatedAtDesc(adminUserId);
     }
 
-    @Transactional
-    public void deleteAllAdminSessionsByAdminUserId(String adminUserId)  {
-        adminSessionRepository.deleteAdminSessionsByAdminUserId(adminUserId);
+    public Optional<AdminSession> findAdminSessionByAdminUserId(String adminUserId) {
+        return adminSessionRepository.findByAdminUserId(adminUserId);
     }
+
 
     @Transactional
     public AdminSession saveNewAdminSession(String adminUserId) {
@@ -86,8 +87,18 @@ public class AuthService {
     }
 
     @Transactional
+    public void updateAdminSession(AdminSession adminSession) {
+        adminSessionRepository.save(adminSession);
+    }
+
+    @Transactional
     public void deleteAllAdminRestPasswordSessionsByAdminUserId(String adminUserId) {
         adminRestPasswordSessionRepository.deleteAdminRestPasswordSessionByAdminUserId(adminUserId);
+    }
+
+
+    public void deleteAdminSessionById(String id) {
+        adminSessionRepository.deleteById(id);
     }
 
     @Transactional

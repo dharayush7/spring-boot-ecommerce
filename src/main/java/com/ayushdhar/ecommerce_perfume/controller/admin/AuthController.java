@@ -16,10 +16,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import static com.ayushdhar.ecommerce_perfume.lib.Utils.generateCuid;
 
 @Slf4j
 @RestController
@@ -116,15 +119,30 @@ public class AuthController {
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
 
-            authService.deleteAllAdminSessionsByAdminUserId(adminUser.getId());
-            authService.deleteAllOtpsForUser(adminUser.getId());
-            AdminSession adminSession = authService.saveNewAdminSession(adminUser.getId());
+            Optional<AdminSession> optionalAdminSession = authService.findAdminSessionByAdminUserId(adminUser.getId());
+
+            AdminSession adminSession;
 
             VerficationResponseDTO responseDTO = new VerficationResponseDTO();
-            responseDTO.setSessionId(adminSession.getId());
-            responseDTO.setPermission(adminUser.getPermission());
+            if (optionalAdminSession.isPresent()) {
+                adminSession = optionalAdminSession.get();
+                adminSession.setSessionToken(generateCuid());
 
-            response.setMsg("Login sucesssful");
+                LocalDateTime now = LocalDateTime.now();
+                LocalDateTime oneHourLater = now.plusHours(1);
+
+                adminSession.setExpireAt(oneHourLater);
+                authService.updateAdminSession(adminSession);
+            }
+                else {
+                adminSession = authService.saveNewAdminSession(adminUser.getId());
+            }
+            responseDTO.setSessionId(adminSession.getSessionToken());
+            responseDTO.setPermission(adminUser.getPermission());
+            authService.deleteAllOtpsForUser(adminUser.getId());
+
+
+            response.setMsg("Login successful");
             response.setData(responseDTO);
 
             return new ResponseEntity<>(response, HttpStatus.OK);
