@@ -15,4 +15,6 @@ public class Constants {
     public static final String ACCESS_DENIED = "Access Denied";
 
     public static final String MANAGER_NOT_FOUND = "Manager not found";
+
+    public static final String PRODUCT = "PRODUCT";
 }

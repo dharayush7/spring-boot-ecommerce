@@ -9,18 +9,15 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "product_on_categories")
 public class ProductOnCategories {
-    @Id
-    private String productId;
-
-    @Id
-    private String categoryId;
+    @EmbeddedId
+    private ProductOnCategoriesId id;
 
     @ManyToOne
-    @JoinColumn(name = "productId", insertable = false, updatable = false)
+    @JoinColumn(name = "productId", referencedColumnName = "id", insertable = false, updatable = false)
     private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "categoryId", insertable = false, updatable = false)
+    @JoinColumn(name = "categoryId", referencedColumnName = "id", insertable = false, updatable = false)
     private Category category;
 
 }

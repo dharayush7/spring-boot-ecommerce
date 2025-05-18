@@ -8,7 +8,7 @@ import com.ayushdhar.ecommerce_perfume.entity.Category;
 import com.ayushdhar.ecommerce_perfume.lib.Constants;
 import com.ayushdhar.ecommerce_perfume.middleware.context.AdminUserContext;
 import com.ayushdhar.ecommerce_perfume.response.ApiResponse;
-import com.ayushdhar.ecommerce_perfume.services.CategoryService;
+import com.ayushdhar.ecommerce_perfume.services.admin.CategoryService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

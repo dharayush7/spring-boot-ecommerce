@@ -1,4 +1,4 @@
-package com.ayushdhar.ecommerce_perfume.services;
+package com.ayushdhar.ecommerce_perfume.services.admin;
 
 import com.ayushdhar.ecommerce_perfume.dto.admin.manager.AddManagerRequestDTO;
 import com.ayushdhar.ecommerce_perfume.entity.AdminUser;

@@ -21,15 +21,18 @@ public class AdminSession {
 
     @Id
     private String id;
+
     @Column(nullable = false)
     private String adminUserId;
+
     @Column(nullable = false, unique = true)
     private String sessionToken;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    @Column(nullable = false, columnDefinition = "timestamp default now() + interval '1 hour'")
-    @Generated(GenerationTime.INSERT)
+
+    @Column(nullable = false)
     private LocalDateTime expireAt;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

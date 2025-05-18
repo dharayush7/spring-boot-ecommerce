@@ -9,7 +9,7 @@ import com.ayushdhar.ecommerce_perfume.lib.ComplexOtpGenerator;
 import com.ayushdhar.ecommerce_perfume.lib.Constants;
 import com.ayushdhar.ecommerce_perfume.lib.Utils;
 import com.ayushdhar.ecommerce_perfume.response.ApiResponse;
-import com.ayushdhar.ecommerce_perfume.services.AuthService;
+import com.ayushdhar.ecommerce_perfume.services.admin.AuthService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -124,6 +124,7 @@ public class AuthController {
             AdminSession adminSession;
 
             VerficationResponseDTO responseDTO = new VerficationResponseDTO();
+
             if (optionalAdminSession.isPresent()) {
                 adminSession = optionalAdminSession.get();
                 adminSession.setSessionToken(generateCuid());
@@ -134,13 +135,13 @@ public class AuthController {
                 adminSession.setExpireAt(oneHourLater);
                 authService.updateAdminSession(adminSession);
             }
-                else {
+            else {
                 adminSession = authService.saveNewAdminSession(adminUser.getId());
             }
+
             responseDTO.setSessionId(adminSession.getSessionToken());
             responseDTO.setPermission(adminUser.getPermission());
             authService.deleteAllOtpsForUser(adminUser.getId());
-
 
             response.setMsg("Login successful");
             response.setData(responseDTO);

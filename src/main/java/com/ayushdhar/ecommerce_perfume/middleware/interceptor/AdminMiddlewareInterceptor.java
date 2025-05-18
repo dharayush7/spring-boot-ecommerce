@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Component
@@ -34,6 +35,7 @@ public class AdminMiddlewareInterceptor implements HandlerInterceptor {
         String sessionToken = authHeader.split(" ")[1];
 
         Optional<AdminSession> sessionOpt = adminSessionRepository.findBySessionToken(sessionToken);
+
         if (sessionOpt.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"msg\": \"Session not found\"}");

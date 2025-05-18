@@ -22,8 +22,11 @@ public class ProductImage {
     @Column(nullable = false)
     private String url;
 
+    @Column(nullable = true)
+    private String productId;
+
     @ManyToOne(optional = true)
-    @JoinColumn(name = "productId", nullable = true)
+    @JoinColumn(name = "productId", nullable = true, referencedColumnName = "id", insertable = false, updatable = false)
     private Product product;
 
     @CreationTimestamp

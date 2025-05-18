@@ -1,4 +1,4 @@
-package com.ayushdhar.ecommerce_perfume.services;
+package com.ayushdhar.ecommerce_perfume.services.admin;
 
 import com.ayushdhar.ecommerce_perfume.entity.AdminRestPasswordSession;
 import com.ayushdhar.ecommerce_perfume.entity.AdminSession;
@@ -11,6 +11,7 @@ import com.ayushdhar.ecommerce_perfume.repository.OtpRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,8 +38,7 @@ public class AuthService {
         return adminUserRepository.findByEmail(email);
     }
 
-    public Optional<AdminUser> findUserById(String id)
-    {
+    public Optional<AdminUser> findUserById(String id) {
         return adminUserRepository.findById(id);
     }
 
@@ -83,6 +83,7 @@ public class AuthService {
     public AdminSession saveNewAdminSession(String adminUserId) {
         AdminSession adminSession = new AdminSession();
         adminSession.setAdminUserId(adminUserId);
+        adminSession.setExpireAt(LocalDateTime.now().plusHours(1));
         return adminSessionRepository.save(adminSession);
     }
 
@@ -97,9 +98,6 @@ public class AuthService {
     }
 
 
-    public void deleteAdminSessionById(String id) {
-        adminSessionRepository.deleteById(id);
-    }
 
     @Transactional
     public AdminRestPasswordSession saveNewAdminRestPasswordSession(String adminUserId) {
