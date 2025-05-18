@@ -3,6 +3,7 @@ package com.ayushdhar.ecommerce_perfume.controller.admin;
 import com.ayushdhar.ecommerce_perfume.dto.admin.upload.UploadRequestDTO;
 import com.ayushdhar.ecommerce_perfume.dto.admin.upload.UploadResponseDTO;
 import com.ayushdhar.ecommerce_perfume.entity.AdminUser;
+import com.ayushdhar.ecommerce_perfume.entity.CarouselImage;
 import com.ayushdhar.ecommerce_perfume.entity.ProductImage;
 import com.ayushdhar.ecommerce_perfume.lib.Constants;
 import com.ayushdhar.ecommerce_perfume.middleware.context.AdminUserContext;
@@ -43,6 +44,32 @@ public class UploadController {
 
             UploadResponseDTO uploadResponseDTO = new UploadResponseDTO();
             uploadResponseDTO.setMediaId(productImage.getId());
+
+            response.setData(uploadResponseDTO);
+            response.setMsg("Image uploaded successfully");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            response.setMsg(Constants.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/carousel")
+    public ResponseEntity<ApiResponse<UploadResponseDTO>> uploadCarouselImageHandler (@Valid @RequestBody UploadRequestDTO uploadRequestDTO) {
+        ApiResponse<UploadResponseDTO> response = new ApiResponse<>();
+        try {
+            AdminUser admin = uploadService.findAdminUserById(AdminUserContext.get().getId()).get();
+
+            if (admin.getPermission().stream().noneMatch(permission -> permission.equals(Constants.ADMIN) || permission.equals("SITE"))) {
+                response.setMsg(Constants.ACCESS_DENIED);
+                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            }
+
+            CarouselImage carouselImage = uploadService.savaCarouselImageByDTO(uploadRequestDTO);
+
+            UploadResponseDTO uploadResponseDTO = new UploadResponseDTO();
+            uploadResponseDTO.setMediaId(carouselImage.getId());
 
             response.setData(uploadResponseDTO);
             response.setMsg("Image uploaded successfully");
