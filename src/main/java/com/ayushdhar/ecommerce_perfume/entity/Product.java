@@ -79,6 +79,9 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<ProductOnCategories> productOnCategories;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<ProductOnCart> productOnCarts;
+
     @PrePersist
     public void prePersist() {
         if (id == null) {
