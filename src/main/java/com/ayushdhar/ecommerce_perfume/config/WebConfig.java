@@ -27,6 +27,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/admin/**");
 
         registry.addInterceptor(userMiddlewareInterceptor)
-                .addPathPatterns("/profile/**", "/cart/**");
+                .addPathPatterns("/profile/**", "/cart/**", "/address/**");
     }
 }
